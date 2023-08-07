@@ -1,0 +1,12 @@
+一、文件
+    1、删除文件
+        rm xxx
+        rm -r *  //删除当前目录所有文件
+        rm -rf xxx  //删除文件夹
+    2、查找文件
+        whereis xxxx
+        find / -name mysql
+
+    3、创建文件/文件夹
+        mkdir -p xxx.xx
+        touch /xx/xxx/xx.xx

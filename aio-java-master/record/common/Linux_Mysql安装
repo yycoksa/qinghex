@@ -1,0 +1,90 @@
+安装流程：https://www.jianshu.com/p/276d59cbc529
+异常解决：https://blog.csdn.net/qq_34531925/article/details/79556850
+
+安装步骤：
+    1、检查是否安装过（若想卸载旧版）
+        rpm -qa | grep mysql
+        rpm -e --nodeps mysql-libs-5.1.73-5.el6_6.x86_64  //卸载存在的
+
+        whereis mysql  //查找所有安装的MySQL目录，删完在验证
+        find / -name mysql // 查找所有安装的MySQL目录，删完在验证
+
+        rm -rf /xx/xxx/mysql /rr/rrr/mysql   //删除所有相关目录
+
+        检查mysql用户组和用户是否存在，如果没有，则创建
+        cat /etc/group | grep mysql
+        cat /etc/passwd |grep mysql
+        groupadd mysql
+        useradd -r -g mysql mysql
+    2、下载安装
+        wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
+        tar xzvf mysql-5.7.24-linux-glibc2.12-x86_64.tar.gz
+        移动该文件到/usr/local/下，并将文件夹名称修改为mysql。
+        mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/
+        cd /usr/local/
+        mv mysql-5.7.24-linux-glibc2.12-x86_64 mysql
+
+        或者
+        [root@localhost /]# mv mysql-5.7.24-linux-glibc2.12-x86_64 /usr/local/mysql
+    3、在/usr/local/mysql目录下创建data目录
+        mkdir /usr/local/mysql/data
+    4、更改mysql目录下所有的目录及文件夹所属的用户组和用户，以及权限
+        chown -R mysql:mysql /usr/local/mysql
+        chmod -R 755 /usr/local/mysql
+    5、编译安装并初始化mysql,务必记住初始化输出日志末尾的密码（数据库管理员临时密码）
+        cd /usr/local/mysql/bin
+        ./mysqld --initialize --user=mysql --datadir=/usr/local/mysql/data --basedir=/usr/local/mysql
+        若有异常：
+        出现该问题首先检查该链接库文件有没有安装使用 命令进行核查
+        rpm -qa|grep libaio
+        运行命令后发现系统中无该链接库文件，则安装
+        yum install  libaio-devel.x86_64
+        若还报错
+        yum -y install numactl
+        以上无误后继续下面操作，记住最后的临时密码
+    6、添加软连接，并重启mysql服务
+        之前启动
+        /usr/local/mysql/support-files/mysql.server start
+        添加软连接
+        ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
+        ln -s /usr/local/mysql/bin/mysql /usr/bin/mysql
+        service mysql restart
+    7、启动MySQL发现异常
+        service mysql status
+        rm -f /var/lock/subsys/mysql
+        service mysql status
+        service mysql start
+        还报错，则注释掉my.cnf
+        mv /etc/my.cnf /etc/my.cnf.bak
+    8、启动MySQL：
+        service mysql start
+    9、登录mysql，修改密码(密码为步骤5生成的临时密码)
+        mysql -u root -p
+        输入临时密码，成功则进入mysql
+        修改密码
+        set password for root@localhost = password('yourpass');
+
+    10、开放远程连接
+        use mysql;
+        update user set user.Host='%' where user.User='root';
+        flush privileges;
+    11、设置开机自动启动
+        1、将服务文件拷贝到init.d下，并重命名为mysql
+        [root@localhost /]# cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+        2、赋予可执行权限
+        [root@localhost /]# chmod +x /etc/init.d/mysqld
+        3、添加服务
+        [root@localhost /]# chkconfig --add mysqld
+        4、显示服务列表
+        [root@localhost /]# chkconfig --list
+
+创建数据库：
+   mysql -u root -p
+   输入密码：root
+   create database mynewdatabase;
+   //注意别漏了“;”分号哦
+
+    在列表中可以找到自己刚刚创建的名为mynewdatabase的数据库
+   show databases;
+   删除数据库可以用命令：
+   drop database mynewdatabase;

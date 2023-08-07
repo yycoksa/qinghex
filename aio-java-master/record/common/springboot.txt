@@ -1,0 +1,7 @@
+【Spring Boot】
+@ComponentScan  在RecordApplication 设置映射路径，
+@MapperScan  设置mapper路径
+@EnableScheduling 用于定时任务
+
+idea安装Lombok 引入依赖
+

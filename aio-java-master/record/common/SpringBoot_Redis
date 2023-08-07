@@ -1,0 +1,22 @@
+安装路径：D:\Apache\Redis-x64-3.2.100
+启动redis：redis-server redis.windows.conf
+开启服务命令：redis-server --service-install redis.windows-service.conf --loglevel verbose
+卸载服务：redis-server --service-uninstall
+开启服务：redis-server --service-start
+停止服务：redis-server --service-stop
+
+命令：
+randomkey  //随机返回一个key
+get key //获取key值
+del key //删除
+set key value //存值
+
+【Jedis】
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+【redis】
+    SpringBoot整合的redis

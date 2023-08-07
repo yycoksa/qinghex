@@ -1,0 +1,24 @@
+【Mybatis】
+一、流式查询
+    指的是查询成功后返回的不是集合，而是一个迭代器，应用每次从迭代器取一次查询结果。
+    优点：降低内存使用
+        若没有流式查询，想从数据库取千万条记录又没有内存，就必须分页查询，而分页查询效率取决于表设计，
+        设计不好则影响分页查询效率。
+    注：流式查询的过程中，数据库连接是保持打开窗状态的，因此：执行一个流式查询后，数据库访问框架就不负责关闭数据库连接，需要应用在取完数据后自己关闭。
+    Mybatis流式查询接口：
+        mybatis提供一个叫org.apache.ibatis.cursor.Cursor的接口类用于流式查询，这个接口继承了java.io.Closeable 和 java.lang.Iterable 接口
+        由此可知：
+            Cursor 是可关闭的；
+            Cursor 是可遍历的。
+        Cursor 还提供了三个方法：
+            isOpen()：用于在取数据之前判断 Cursor 对象是否是打开状态。只有当打开时 Cursor 才能取数据；
+            isConsumed()：用于判断查询结果是否全部取完。
+            getCurrentIndex()：返回已经获取了多少条数据
+        因为 Cursor 实现了迭代器接口，因此在实际使用当中，从 Cursor 取数据非常简单：
+            try( Cursor sursor = mapper.querySomeData() ){
+                cursor.forEach(rowObject -> {...});
+            }
+            使用try-resource方式可以令Cursor自动关闭。
+        报错：java.lang.IllegalStateException: A Cursor is already closed.
+            这是因为我们前面说了在取数据的过程中需要保持数据库连接，而 Mapper 方法通常在执行完后连接就关闭了，因此 Cusor 也一并关闭了。
+            所以，解决这个问题的思路不复杂，保持数据库连接打开即可。我们至少有三种方案可选。

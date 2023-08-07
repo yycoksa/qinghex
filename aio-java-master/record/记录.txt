@@ -1,0 +1,3 @@
+vpn url 221.6.6.133:11723
+usrname admin
+password 123456
